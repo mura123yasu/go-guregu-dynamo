@@ -14,7 +14,7 @@ import (
 type Item struct {
 	MyHashKey  string
 	MyRangeKey int
-	Text       string
+	MyText     string
 }
 
 func main() {
@@ -47,7 +47,7 @@ func main() {
 	item := Item{
 		MyHashKey:  "MyHash",
 		MyRangeKey: 1,
-		Text:       "My First Text",
+		MyText:     "My First Text",
 	}
 
 	err := table.Put(item).Run()
@@ -67,9 +67,16 @@ func main() {
 	// 単純なCRUD - Update
 	var updateResult Item
 	text := "My Second Text"
-	err = table.Update("MyHashKey", item.MyHashKey).Range("MyRangeKey", item.MyRangeKey).Set("Text", text).Value(&updateResult)
+	err = table.Update("MyHashKey", item.MyHashKey).Range("MyRangeKey", item.MyRangeKey).Set("MyText", text).Value(&updateResult)
 	if err != nil {
 		fmt.Printf("Failed to update item[%v]\n", err)
+	}
+
+	//////////////////////
+	// Conditional Check
+	err = table.Delete("MyHashKey", item.MyHashKey).Range("MyRangeKey", item.MyRangeKey).If("MyText = ?", "some word").Run()
+	if err != nil {
+		fmt.Printf("Failed to delete item with confitional check[%v]\n", err)
 	}
 
 	//////////////////////
@@ -79,6 +86,4 @@ func main() {
 		fmt.Printf("Failed to delete item[%v]\n", err)
 	}
 
-	//////////////////////
-	// Conditional Update
 }
